@@ -1,0 +1,22 @@
+{
+  "rateLimitingTimeoutSeconds": 10,
+  "adminRateLimitingTimeoutSeconds": 1,
+  "DSN": "host=localhost port=5432 dbname=selfletter",
+  "firstRun": true,
+  "tokenAndKeyLength": 128,
+  "urlPrefix": "/newsletter/api",
+  "debug": false,
+  "domain": "localhost:8080",
+  "internalAddress": "localhost:8080",
+  "email": {
+    "from": "John Doe <myemail@myemailserver.com>",
+    "auth": {
+      "identity": "",
+      "username": "myemail@myemailserver.com",
+      "password": "mySmtpPassword",
+      "host": "smtp.myemailserver.com",
+      "port": 465,
+      "encryption": "SSL"
+    }
+  }
+}
