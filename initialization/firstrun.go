@@ -1,11 +1,11 @@
-package helpers
+package initialization
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"selfletter-backend/config"
 	"selfletter-backend/db"
+	"selfletter-backend/secureToken"
 )
 
 func FirstRun() {
@@ -14,7 +14,7 @@ func FirstRun() {
 	if err != nil {
 		panic("first run: failed to create file containing frontend admin keys")
 	}
-	key := GenerateSecureToken()
+	key := secureToken.GenerateSecureToken()
 
 	_, err = file.Write([]byte(key))
 	if err != nil {
@@ -34,8 +34,7 @@ func FirstRun() {
 
 	cfg := config.GetConfig()
 	cfg.FirstRun = false
-	cfgMarshal, _ := json.Marshal(cfg)
-	err = os.WriteFile("config.json", cfgMarshal, 0644)
+	err = config.WriteConfig(cfg)
 	if err != nil {
 		panic("first run: failed to write config file")
 	}

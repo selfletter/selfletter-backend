@@ -1,4 +1,4 @@
-package helpers
+package ratelimiting
 
 import (
 	ratelimit "github.com/JGLTechnologies/gin-rate-limit"

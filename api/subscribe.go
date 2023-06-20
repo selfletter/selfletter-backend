@@ -6,26 +6,26 @@ import (
 	"net/http"
 	"net/mail"
 	"selfletter-backend/db"
-	"selfletter-backend/helpers"
+	"selfletter-backend/secureToken"
 	"strings"
 )
 
-type SubscribeResponse struct {
+type subscribeResponse struct {
 	Error string `json:"error"`
 	Token string `json:"token"`
 }
 
 func Subscribe(c *gin.Context) {
 	dbHandle := db.GetDatabaseHandle()
-	token := helpers.GenerateSecureToken()
+	token := secureToken.GenerateSecureToken()
 	for i := 0; i < 10; i++ {
 		if dbHandle.First(&db.User{}, "token = ?", token).RowsAffected != 0 {
-			token = helpers.GenerateSecureToken()
+			token = secureToken.GenerateSecureToken()
 		} else {
 			break
 		}
 		if i == 9 {
-			c.JSON(http.StatusInternalServerError, SubscribeResponse{
+			c.JSON(http.StatusInternalServerError, subscribeResponse{
 				Error: "too many collisions",
 				Token: "",
 			})
@@ -38,21 +38,21 @@ func Subscribe(c *gin.Context) {
 	email := c.Query("email")
 
 	if topics == "" {
-		c.JSON(http.StatusBadRequest, SubscribeResponse{
+		c.JSON(http.StatusBadRequest, subscribeResponse{
 			Error: "no topics chosen",
 			Token: "",
 		})
 		return
 	}
 	if email == "" {
-		c.JSON(http.StatusBadRequest, SubscribeResponse{
+		c.JSON(http.StatusBadRequest, subscribeResponse{
 			Error: "email is empty",
 			Token: "",
 		})
 		return
 	}
 	if dbHandle.First(&db.User{}, "email = ?", email).RowsAffected != 0 {
-		c.JSON(http.StatusBadRequest, SubscribeResponse{
+		c.JSON(http.StatusBadRequest, subscribeResponse{
 			Error: "user already exists",
 			Token: "",
 		})
@@ -60,7 +60,7 @@ func Subscribe(c *gin.Context) {
 	}
 	for _, topic := range topicsSlice {
 		if dbHandle.First(&db.Topic{}, "name = ?", topic).RowsAffected == 0 {
-			c.JSON(http.StatusBadRequest, SubscribeResponse{
+			c.JSON(http.StatusBadRequest, subscribeResponse{
 				Error: "there is no such topic: " + topic,
 				Token: "",
 			})
@@ -68,7 +68,7 @@ func Subscribe(c *gin.Context) {
 		}
 	}
 	if _, err := mail.ParseAddress(email); err != nil {
-		c.JSON(http.StatusBadRequest, SubscribeResponse{
+		c.JSON(http.StatusBadRequest, subscribeResponse{
 			Error: "bad email",
 			Token: "",
 		})
@@ -90,14 +90,14 @@ func Subscribe(c *gin.Context) {
 	})
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, SubscribeResponse{
+		c.JSON(http.StatusInternalServerError, subscribeResponse{
 			Error: "database error",
 			Token: "",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, SubscribeResponse{
+	c.JSON(http.StatusOK, subscribeResponse{
 		Error: "",
 		Token: token,
 	})

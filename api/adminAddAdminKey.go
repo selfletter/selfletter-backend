@@ -5,25 +5,25 @@ import (
 	"net/http"
 	"os"
 	"selfletter-backend/db"
-	"selfletter-backend/helpers"
+	"selfletter-backend/secureToken"
 )
 
-type AdminAddAdminKeyRequest struct {
+type adminAddAdminKeyRequest struct {
 	Key string `json:"key" binding:"required"`
 }
 
-type AdminAddAdminKeyResponse struct {
+type adminAddAdminKeyResponse struct {
 	Error string `json:"error"`
 	Key   string `json:"key"`
 }
 
 func AdminAddAdminKey(c *gin.Context) {
-	var request AdminAddAdminKeyRequest
+	var request adminAddAdminKeyRequest
 	dbHandle := db.GetDatabaseHandle()
 
 	err := c.BindJSON(&request)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, AdminAddAdminKeyResponse{
+		c.JSON(http.StatusBadRequest, adminAddAdminKeyResponse{
 			Error: "bad json",
 			Key:   "",
 		})
@@ -31,22 +31,22 @@ func AdminAddAdminKey(c *gin.Context) {
 	}
 
 	if dbHandle.First(&db.AdminKey{}, "key = ?", request.Key).RowsAffected == 0 {
-		c.JSON(http.StatusForbidden, AdminAddAdminKeyResponse{
+		c.JSON(http.StatusForbidden, adminAddAdminKeyResponse{
 			Error: "invalid admin key",
 			Key:   "",
 		})
 		return
 	}
 
-	key := helpers.GenerateSecureToken()
+	key := secureToken.GenerateSecureToken()
 	for i := 0; i < 10; i++ {
 		if dbHandle.First(&db.User{}, "key = ?", key).RowsAffected != 0 {
-			key = helpers.GenerateSecureToken()
+			key = secureToken.GenerateSecureToken()
 		} else {
 			break
 		}
 		if i == 9 {
-			c.JSON(http.StatusInternalServerError, AdminAddAdminKeyResponse{
+			c.JSON(http.StatusInternalServerError, adminAddAdminKeyResponse{
 				Error: "too many collisions",
 				Key:   "",
 			})
@@ -55,7 +55,7 @@ func AdminAddAdminKey(c *gin.Context) {
 	}
 
 	if err := dbHandle.Create(&db.AdminKey{Key: key}).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, AdminAddAdminKeyResponse{
+		c.JSON(http.StatusInternalServerError, adminAddAdminKeyResponse{
 			Error: "database error",
 			Key:   "",
 		})
@@ -64,7 +64,7 @@ func AdminAddAdminKey(c *gin.Context) {
 
 	file, err := os.OpenFile("admin_keys.txt", os.O_RDWR, os.ModeAppend)
 	if err != nil {
-		c.JSON(http.StatusMultiStatus, AdminAddAdminKeyResponse{
+		c.JSON(http.StatusMultiStatus, adminAddAdminKeyResponse{
 			Error: "warning: admin key added to database, but not saved in file on server",
 			Key:   key,
 		})
@@ -75,7 +75,7 @@ func AdminAddAdminKey(c *gin.Context) {
 	_, _ = file.Seek(0, 2)
 	_, err = file.WriteString("\n" + key)
 	if err != nil {
-		c.JSON(http.StatusMultiStatus, AdminAddAdminKeyResponse{
+		c.JSON(http.StatusMultiStatus, adminAddAdminKeyResponse{
 			Error: "warning: admin key added to database, but not saved in file on server",
 			Key:   key,
 		})
@@ -84,14 +84,14 @@ func AdminAddAdminKey(c *gin.Context) {
 
 	_ = file.Sync()
 	if err != nil {
-		c.JSON(http.StatusMultiStatus, AdminAddAdminKeyResponse{
+		c.JSON(http.StatusMultiStatus, adminAddAdminKeyResponse{
 			Error: "warning: admin key added to database, but not saved in file on server",
 			Key:   key,
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, AdminAddAdminKeyResponse{
+	c.JSON(http.StatusOK, adminAddAdminKeyResponse{
 		Error: "",
 		Key:   key,
 	})

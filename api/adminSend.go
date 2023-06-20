@@ -10,27 +10,27 @@ import (
 	"strings"
 )
 
-type AdminSendRequest struct {
+type adminSendRequest struct {
 	Key     string `json:"key" binding:"required"`
 	Topic   string `json:"topic" binding:"required"`
 	Message string `json:"message" binding:"required"`
 	Subject string `json:"subject" binding:"required"`
 }
 
-type AdminSendResponse struct {
+type adminSendResponse struct {
 	Errors        []string `json:"errors"`
 	CriticalError string   `json:"criticalError"`
 }
 
 func AdminSend(c *gin.Context) {
 	cfg := config.GetConfig()
-	var request AdminSendRequest
+	var request adminSendRequest
 	var errors []string
 	dbHandle := db.GetDatabaseHandle()
 
 	err := c.BindJSON(&request)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, AdminSendResponse{
+		c.JSON(http.StatusBadRequest, adminSendResponse{
 			Errors:        nil,
 			CriticalError: "bad json",
 		})
@@ -38,7 +38,7 @@ func AdminSend(c *gin.Context) {
 	}
 
 	if dbHandle.First(&db.AdminKey{}, "key = ?", request.Key).RowsAffected == 0 {
-		c.JSON(http.StatusForbidden, AdminSendResponse{
+		c.JSON(http.StatusForbidden, adminSendResponse{
 			Errors:        nil,
 			CriticalError: "invalid admin key",
 		})
@@ -47,7 +47,7 @@ func AdminSend(c *gin.Context) {
 
 	_, err = html.Parse(strings.NewReader(request.Message))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, AdminSendResponse{
+		c.JSON(http.StatusBadRequest, adminSendResponse{
 			Errors:        nil,
 			CriticalError: "bad message html",
 		})
@@ -58,7 +58,7 @@ func AdminSend(c *gin.Context) {
 	var usersTopicsRel []db.UsersTopicsRel
 	err = dbHandle.Where("topic = ?", request.Topic).Find(&usersTopicsRel).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, AdminSendResponse{
+		c.JSON(http.StatusInternalServerError, adminSendResponse{
 			Errors:        nil,
 			CriticalError: "database error",
 		})
@@ -96,7 +96,7 @@ func AdminSend(c *gin.Context) {
 		case "None":
 			mailServer.Encryption = mail.EncryptionNone
 		default:
-			c.JSON(http.StatusInternalServerError, AdminSendResponse{
+			c.JSON(http.StatusInternalServerError, adminSendResponse{
 				Errors:        nil,
 				CriticalError: "mail server auth encryption set incorrectly",
 			})
@@ -130,14 +130,14 @@ func AdminSend(c *gin.Context) {
 	}
 
 	if len(errors) != 0 {
-		c.JSON(http.StatusMultiStatus, AdminSendResponse{
+		c.JSON(http.StatusMultiStatus, adminSendResponse{
 			Errors:        errors,
 			CriticalError: "",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, AdminSendResponse{
+	c.JSON(http.StatusOK, adminSendResponse{
 		Errors:        nil,
 		CriticalError: "",
 	})

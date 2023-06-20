@@ -7,23 +7,23 @@ import (
 	"strings"
 )
 
-type AdminAddTopicRequest struct {
+type adminAddTopicRequest struct {
 	Key  string `json:"key" binding:"required"`
 	Name string `json:"name" binding:"required"`
 }
 
-type AdminAddTopicResponse struct {
+type adminAddTopicResponse struct {
 	Error string `json:"error"`
 	Topic string `json:"topic"`
 }
 
 func AdminAddTopic(c *gin.Context) {
-	var request AdminAddTopicRequest
+	var request adminAddTopicRequest
 	dbHandle := db.GetDatabaseHandle()
 
 	err := c.BindJSON(&request)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, AdminAddTopicResponse{
+		c.JSON(http.StatusBadRequest, adminAddTopicResponse{
 			Error: "bad json",
 			Topic: "",
 		})
@@ -31,7 +31,7 @@ func AdminAddTopic(c *gin.Context) {
 	}
 
 	if dbHandle.First(&db.AdminKey{}, "key = ?", request.Key).RowsAffected == 0 {
-		c.JSON(http.StatusForbidden, AdminAddTopicResponse{
+		c.JSON(http.StatusForbidden, adminAddTopicResponse{
 			Error: "invalid admin key",
 			Topic: "",
 		})
@@ -39,7 +39,7 @@ func AdminAddTopic(c *gin.Context) {
 	}
 
 	if strings.Contains(request.Name, ",") {
-		c.JSON(http.StatusBadRequest, AdminAddTopicResponse{
+		c.JSON(http.StatusBadRequest, adminAddTopicResponse{
 			Error: "name can't contain \",\"",
 			Topic: "",
 		})
@@ -47,7 +47,7 @@ func AdminAddTopic(c *gin.Context) {
 	}
 
 	if dbHandle.First(&db.Topic{}, "name = ?", request.Name).RowsAffected != 0 {
-		c.JSON(http.StatusBadRequest, AdminAddTopicResponse{
+		c.JSON(http.StatusBadRequest, adminAddTopicResponse{
 			Error: "topic already exists",
 			Topic: request.Name,
 		})
@@ -55,14 +55,14 @@ func AdminAddTopic(c *gin.Context) {
 	}
 
 	if err := dbHandle.Create(db.Topic{Name: request.Name}).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, AdminAddTopicResponse{
+		c.JSON(http.StatusInternalServerError, adminAddTopicResponse{
 			Error: "database error",
 			Topic: "",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, AdminAddTopicResponse{
+	c.JSON(http.StatusOK, adminAddTopicResponse{
 		Error: "",
 		Topic: request.Name,
 	})

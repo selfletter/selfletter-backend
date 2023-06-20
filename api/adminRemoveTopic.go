@@ -7,23 +7,23 @@ import (
 	"selfletter-backend/db"
 )
 
-type AdminRemoveTopicRequest struct {
+type adminRemoveTopicRequest struct {
 	Key   string `json:"key" binding:"required"`
 	Topic string `json:"topic" binding:"required"`
 }
 
-type AdminRemoveTopicResponse struct {
+type adminRemoveTopicResponse struct {
 	Error string `json:"error"`
 	Topic string `json:"topic"`
 }
 
 func AdminRemoveTopic(c *gin.Context) {
-	var request AdminRemoveTopicRequest
+	var request adminRemoveTopicRequest
 	dbHandle := db.GetDatabaseHandle()
 
 	err := c.BindJSON(&request)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, AdminRemoveTopicResponse{
+		c.JSON(http.StatusBadRequest, adminRemoveTopicResponse{
 			Error: "bad json",
 			Topic: "",
 		})
@@ -31,7 +31,7 @@ func AdminRemoveTopic(c *gin.Context) {
 	}
 
 	if dbHandle.First(&db.AdminKey{}, "key = ?", request.Key).RowsAffected == 0 {
-		c.JSON(http.StatusForbidden, AdminRemoveTopicResponse{
+		c.JSON(http.StatusForbidden, adminRemoveTopicResponse{
 			Error: "invalid admin key",
 			Topic: "",
 		})
@@ -39,7 +39,7 @@ func AdminRemoveTopic(c *gin.Context) {
 	}
 
 	if dbHandle.First(&db.Topic{}, "name = ?", request.Topic).RowsAffected == 0 {
-		c.JSON(http.StatusBadRequest, AdminRemoveTopicResponse{
+		c.JSON(http.StatusBadRequest, adminRemoveTopicResponse{
 			Error: "topic doesn't exist",
 			Topic: "",
 		})
@@ -61,14 +61,14 @@ func AdminRemoveTopic(c *gin.Context) {
 	})
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, AdminRemoveTopicResponse{
+		c.JSON(http.StatusInternalServerError, adminRemoveTopicResponse{
 			Error: "database error",
 			Topic: "",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, AdminRemoveTopicResponse{
+	c.JSON(http.StatusOK, adminRemoveTopicResponse{
 		Error: "",
 		Topic: request.Topic,
 	})

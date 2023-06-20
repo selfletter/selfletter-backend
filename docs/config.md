@@ -5,19 +5,21 @@
 
 `adminRateLimitingTimeoutSeconds` - positive integer, admin actions rate limiting timeout in seconds
 
-`DSN` - string, postgresql database config, refer to [wikipedia](https://en.wikipedia.org/wiki/Data_source_name).
+`DSN` - string, postgresql database config, refer to [wikipedia](https://en.wikipedia.org/wiki/Data_source_name)
 
-`firstRun` - bool, generates admin key and puts it in `admin_keys.txt`. Will be automatically set to false after first run.
+`firstRun` - bool, generates admin key and puts it in `admin_keys.txt`. Will be automatically set to false after first
+run
 
-`tokenAndKeyLength` - positive integer, should be not 0 and should be divisible by 2, length for admin key and user tokens.
+`tokenAndKeyLength` - positive integer, should be not 0 and should be divisible by 2, length for admin key and user
+tokens
 
-`urlPrefix` - string, api url prefix.
+`urlPrefix` - string, api url prefix
 
-`debug` - bool, debug mode.
+`debug` - bool, debug mode
 
-`domain` - string, your internet domain.
+`domain` - string, your internet domain
 
-`internalAddress` - string, internal address of your machine on which you host backend.
+`internalAddress` - string, internal address of your machine on which you host backend
 
 `email` - object, email specific settings
 

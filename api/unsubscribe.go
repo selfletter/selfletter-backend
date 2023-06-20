@@ -7,7 +7,7 @@ import (
 	"selfletter-backend/db"
 )
 
-type UnsubscribeResponse struct {
+type unsubscribeResponse struct {
 	Error string `json:"error"`
 }
 
@@ -15,11 +15,11 @@ func Unsubscribe(c *gin.Context) {
 	dbHandle := db.GetDatabaseHandle()
 	token := c.Query("token")
 	if token == "" {
-		c.JSON(http.StatusBadRequest, UnsubscribeResponse{Error: "empty token"})
+		c.JSON(http.StatusBadRequest, unsubscribeResponse{Error: "empty token"})
 		return
 	}
 	if dbHandle.First(&db.User{}, "token = ?", token).RowsAffected == 0 {
-		c.JSON(http.StatusBadRequest, UnsubscribeResponse{Error: "invalid token"})
+		c.JSON(http.StatusBadRequest, unsubscribeResponse{Error: "invalid token"})
 		return
 	}
 
@@ -37,9 +37,9 @@ func Unsubscribe(c *gin.Context) {
 	})
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, UnsubscribeResponse{Error: "database error"})
+		c.JSON(http.StatusInternalServerError, unsubscribeResponse{Error: "database error"})
 		return
 	}
 
-	c.JSON(http.StatusOK, UnsubscribeResponse{Error: ""})
+	c.JSON(http.StatusOK, unsubscribeResponse{Error: ""})
 }

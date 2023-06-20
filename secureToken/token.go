@@ -1,4 +1,4 @@
-package helpers
+package secureToken
 
 import (
 	"crypto/rand"

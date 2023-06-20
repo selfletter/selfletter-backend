@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 )
 
@@ -30,24 +31,35 @@ type Config struct {
 
 var config Config
 
-func ParseConfig() {
+func ParseConfig() error {
 	var data Config
 	content, err := os.ReadFile("config.json")
 	if err != nil {
-		panic("config: failed to open config file")
+		return err
 	}
 
 	err = json.Unmarshal(content, &data)
 	if err != nil {
-		panic("config: failed to read json")
+		return err
 	}
 	if data.TokenAndKeyLength%2 != 0 || data.TokenAndKeyLength == 0 {
-		panic("config: tokenAndKeyLength should be divisible by 2 and should not be 0")
+		return errors.New("tokenAndKeyLength should be divisible by 2 and should not be 0")
 	}
 
 	config = data
+	return nil
 }
 
-func GetConfig() *Config {
-	return &config
+func WriteConfig(data Config) error {
+	dataMarshal, _ := json.Marshal(data)
+	err := os.WriteFile("config.json", dataMarshal, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func GetConfig() Config {
+	return config
 }
