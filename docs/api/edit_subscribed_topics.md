@@ -19,8 +19,7 @@ token - user manage token
 
 ```json
 {
-  "error": ""
-  // string, possible values: "", "no topics chosen", "there is no such user", "there is no such topic: %topicName%", "database error" 
+  "error": "" // string, possible values: "", "no topics chosen", "there is no such user", "there is no such topic: %topicName%", "database error" 
 }
 ```
 
@@ -41,7 +40,6 @@ If your request get rate limited, you will get ***different*** response JSON:
 
 ```json
 {
-  "error": "try again in 0s"
-  // string, time of rate limiting may differ
+  "error": "try again in 0s" // string, time of rate limiting may differ
 }
 ```

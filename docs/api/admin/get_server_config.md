@@ -10,8 +10,7 @@ Get current server config.
 
 ```json 
 {
-  "key": ""
-  // string, admin key
+  "key": "" // string, admin key
 }
 ```
 
@@ -21,46 +20,26 @@ Get current server config.
 
 ```json
 {
-  "error": "",
-  // string, possible values: "", "bad json", "invalid admin key"
-  "config": {
-    // object, current config, if there is an error config will be with empty (default) fields presented below
-    "rateLimitingTimeoutSeconds": 0,
-    // positive integer, user actions rate limiting timeout in seconds
-    "adminRateLimitingTimeoutSeconds": 0,
-    // positive integer, admin actions rate limiting timeout in seconds
-    "DSN": "",
-    // string, postgresql database config
-    "firstRun": false,
-    // bool, generates admin key and puts it in `admin_keys.txt`. will be automatically set to false after first run
-    "tokenAndKeyLength": 0,
-    // positive integer, should be not 0 and should be divisible by 2, length for admin key and user tokens
-    "urlPrefix": "",
-    // string, api url prefix
-    "debug": false,
-    // bool, debug mode
-    "domain": "",
-    // string, server internet domain.
-    "internalAddress": "",
-    // string, internal address of machine on which backend is hosted.
-    "email": {
-      // object, email specific settings
-      "from": "",
-      // string, from email field
-      "auth": {
-        // object, email auth specific settings
-        "identity": "",
-        // string, email identity
-        "username": "",
-        // string, email server username
-        "password": "",
-        // string, email server password
-        "host": "",
-        // string, email server address
-        "port": 0,
-        // string, email server port
-        "encryption": ""
-        // string, email server encryption. Possible values: "SSL/TLS", "TLS", "STARTTLS", "SSL", "None"
+  "error": "", // string, possible values: "", "bad json", "invalid admin key"
+  "config": { // object, current config, if there is an error config will be with empty (default) fields presented below
+    "rateLimitingTimeoutSeconds": 0, // positive integer, user actions rate limiting timeout in seconds
+    "adminRateLimitingTimeoutSeconds": 0, // positive integer, admin actions rate limiting timeout in seconds
+    "DSN": "", // string, postgresql database config
+    "firstRun": false, // bool, generates admin key and puts it in `admin_keys.txt`. will be automatically set to false after first run
+    "tokenAndKeyLength": 0, // positive integer, should be not 0 and should be divisible by 2, length for admin key and user tokens
+    "urlPrefix": "", // string, api url prefix
+    "debug": false, // bool, debug mode
+    "domain": "", // string, server internet domain.
+    "internalAddress": "", // string, internal address of machine on which backend is hosted.
+    "email": { // object, email specific settings
+      "from": "", // string, from email field
+      "auth": { // object, email auth specific settings
+        "identity": "", // string, email identity
+        "username": "", // string, email server username
+        "password": "", // string, email server password
+        "host": "", // string, email server address
+        "port": 0, // string, email server port
+        "encryption": "" // string, email server encryption. Possible values: "SSL/TLS", "TLS", "STARTTLS", "SSL", "None"
       }
     }
   }
@@ -111,7 +90,6 @@ If your request get rate limited, you will get ***different*** response JSON:
 
 ```json
 {
-  "error": "try again in 0s"
-  // string, time of rate limiting may differ
+  "error": "try again in 0s" // string, time of rate limiting may differ
 }
 ```
